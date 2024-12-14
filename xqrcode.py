@@ -2,7 +2,9 @@ from typing import TYPE_CHECKING, List
 
 import qrcode.image.base
 from PIL import Image, ImageDraw
-from qrcode.image.styles.colormasks import QRColorMask
+from qrcode.image.styles.colormasks import (
+QRColorMask, SolidFillColorMask
+)
 from qrcode.image.styles.moduledrawers import SquareModuleDrawer
 from qrcode.image.styles.moduledrawers.base import QRModuleDrawer
 
@@ -34,12 +36,15 @@ class XStyledPilImage(qrcode.image.base.BaseImageWithDrawer):
     kind = "PNG"
 
     needs_processing = True
+    color_mask: QRColorMask
     default_drawer_class = SquareModuleDrawer
 
     def __init__(self, *args, **kwargs):
-        self.back_color = kwargs.get("back_color", (255, 255, 255, 0))
+        #self.back_color = kwargs.get("back_color", (255, 255, 255, 0))
+        self.color_mask = kwargs.get("color_mask", SolidFillColorMask())
         embeded_image_path = kwargs.get("embeded_image_path", None)
         self.embeded_image = kwargs.get("embeded_image", None)
+        self.embeded_image_ratio = kwargs.get("embeded_image_ratio", 0.25)
         self.embeded_image_resample = kwargs.get(
             "embeded_image_resample", Image.Resampling.LANCZOS
         )
@@ -49,17 +54,37 @@ class XStyledPilImage(qrcode.image.base.BaseImageWithDrawer):
         # the paint_color is the color the module drawer will use to draw upon
         # a canvas During the color mask process, pixels that are paint_color
         # are replaced by a newly-calculated color
-        self.paint_color = self.back_color
+        #self.paint_color = self.back_color
+        self.paint_color = tuple(0 for i in self.color_mask.back_color)
+
+
 
         super().__init__(*args, **kwargs)
 
     def new_image(self, **kwargs):
-        return Image.new("RGBA", (self.pixel_size, self.pixel_size), self.back_color)
+        mode = (
+            "RGBA"
+            if (
+                    self.color_mask.has_transparency
+                    or (self.embeded_image and "A" in self.embeded_image.getbands())
+            )
+            else "RGB"
+        )
+        # This is the background color. Should be white or whiteish
+        back_color = self.color_mask.back_color
+
+        return Image.new(mode, (self.pixel_size, self.pixel_size), back_color)
+
+        #return Image.new("RGBA", (self.pixel_size, self.pixel_size), self.back_color)
 
     def init_new_image(self):
+        self.color_mask.initialize(self, self._img)
+
         super().init_new_image()
 
     def process(self):
+        self.color_mask.apply_mask(self._img)
+
         if self.embeded_image:
             self.draw_embeded_image()
 
@@ -157,7 +182,7 @@ class XSquareModuleDrawer(XStyledPilQRModuleDrawer):
                 if self.is_eye_center(box[0][1], box[0][0])
                 else self.front_color
             )
-            self.imgDraw.rectangle(box, fill=color)
+            self.imgDraw.rectangle(box, color)
 
 
 class XGappedSquareModuleDrawer(XStyledPilQRModuleDrawer):
@@ -462,3 +487,20 @@ class XHorizontalBarsDrawer(XStyledPilQRModuleDrawer):
                 colored_shape[right],
                 (box[0][0] + self.half_width, box[0][1] + self.delta),
             )
+
+
+qr = qrcode.QRCode()
+qr.add_data("https://example.com")
+
+img = qr.make_image(
+    image_factory=XStyledPilImage,
+    color_mask=SolidFillColorMask(front_color=(255,255,255), back_color=(1,1,1)),
+mmodule_drawer=XSquareModuleDrawer(),
+    #back_color=(1, 1, 1),
+    #module_drawer=XSquareModuleDrawer(front_color=(255,255,255)),
+    eye_drawer=XGappedSquareModuleDrawer(
+        front_color=(0,30,0),
+        inner_eye_color=(255,255,255)
+    ),
+)
+img.save("qrcode-xcolor.png")
