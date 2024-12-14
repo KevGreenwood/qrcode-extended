@@ -52,11 +52,10 @@ img = qr.make_image(
     ),
     module_drawer=GappedSquareModuleDrawer(),
     eye_drawer=RoundedModuleDrawer(),
-    embeded_image_path='docs/gitlab.png',
+    embeded_image_path='gitlab.png',
 )
 img.save("qrcode_color_mask.png")
 print(f"qrcode color_mask: {time.time() - st:.4f}s")
-
 
 st = time.time()
 qr = qrcode.QRCode()
@@ -73,7 +72,7 @@ img = qr.make_image(
         front_color=(255, 110, 0, 255),
         inner_eye_color=(65, 14, 158, 255),  # Only valid with the eye_drawer
     ),
-    embeded_image_path='docs/gitlab.png',  # Still supports embedding logos in the middle
+    embeded_image_path='gitlab.png',  # Still supports embedding logos in the middle
 )
 img.save("qrcode-xcolor.png")
 print(f"qrcode-xcolor: {time.time() - st:.4f}s")

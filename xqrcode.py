@@ -1,13 +1,7 @@
-"""
-These classes have been copied from https://github.com/lincolnloop/python-qrcode
-This way they could be modified for the purpose of this library
-without having to overwrite the originals
-"""
-
 from typing import TYPE_CHECKING, List
 
 import qrcode.image.base
-from qrcode.compat.pil import Image, ImageDraw
+from PIL import Image, ImageDraw
 from qrcode.image.styles.colormasks import QRColorMask
 from qrcode.image.styles.moduledrawers import SquareModuleDrawer
 from qrcode.image.styles.moduledrawers.base import QRModuleDrawer
