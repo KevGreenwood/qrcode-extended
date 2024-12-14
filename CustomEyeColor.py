@@ -45,6 +45,7 @@ class XStyledPilImage(qrcode.image.base.BaseImageWithDrawer):
 
     def __init__(self, *args, **kwargs):
         self.back_color = kwargs.get("back_color", (255, 255, 255, 0))
+        # MASK
         embeded_image_path = kwargs.get("embeded_image_path", None)
         self.embeded_image = kwargs.get("embeded_image", None)
         self.embeded_image_resample = kwargs.get(
