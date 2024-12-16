@@ -1,3 +1,5 @@
+# Original made by Reegan Alward
+
 import PIL
 from PIL import Image, ImageDraw
 
@@ -34,8 +36,8 @@ from qrcode.image.styles.moduledrawers import RoundedModuleDrawer,VerticalBarsDr
 from  qrcode.image.styles.colormasks import SolidFillColorMask
 
 
-
-qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
+border=0
+qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H, border=border)
 
 qr.add_data("MECARD:N:{lastname_txt.value},{name_txt.value};NICKNAME:{nickname_txt.value};TEL:{work_phone_txt.value};TEL:{priv_phone_txt.value};TEL:{phone_txt.value};EMAIL:{mail_txt.value};BDAY:{self.birthday};URL:{url_txt.value}NOTE:{filled_txt.value};ADR:,,{street_txt.value},{city_txt.value},{state_txt.value},{zip_txt.value},{country_txt.value};;")
 
